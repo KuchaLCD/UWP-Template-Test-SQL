@@ -1,0 +1,41 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UWP_Template_Test_SQL.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Custom="using:Microsoft.UI.Xaml.Controls"
+    x:Class="UWP_Template_Test_SQL.Views.UserLogPage"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid x:Name="ContentArea" Margin="{StaticResource MediumLeftRightMargin}">
+        <Grid Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
+            <Grid VerticalAlignment="Top" Margin="10,10,0,0" HorizontalAlignment="Left" MaxWidth="360">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" HorizontalAlignment="Left" Height="137" VerticalAlignment="Center" Width="100">
+                    <Custom:PersonPicture x:Name="UserAvatar" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    <HyperlinkButton Content="Change avatar" Margin="0,105,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Click="Change_Avatar_Button_Click"/>
+                </Grid>
+                <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" Height="Auto" Margin="10,16,0,0" VerticalAlignment="Top" Orientation="Horizontal">
+                    <Grid HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Center">
+                        <TextBlock x:Name="UserName" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="User Name" VerticalAlignment="Top" FontFamily="Cascadia Mono" FontSize="32"/>
+                        <TextBlock x:Name="ProfCategory" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="Profession" VerticalAlignment="Top" FontFamily="Consolas" FontSize="22" Margin="0,42,0,0"/>
+                    </Grid>
+                    <Button x:Name="EditButton" ToolTipService.ToolTip="Редактировать" Width="38" Height="38" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5,5,0,0" Visibility="Collapsed">
+                        <SymbolIcon Symbol="Edit" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- 
+            The SystemControlPageBackgroundChromeLowBrush background represents where you should place your content. 
+            Place your content here.
+        -->
+
+        </Grid>
+    </Grid>
+</Page>
