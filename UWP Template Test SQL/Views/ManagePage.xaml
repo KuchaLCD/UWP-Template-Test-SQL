@@ -22,7 +22,7 @@
     <Grid x:Name="ContentArea" Margin="{StaticResource MediumLeftRightMargin}">
         <Grid Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
             <RelativePanel>
-                <Custom:TabView Margin="0,10,0,0" IsAddTabButtonVisible="False" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                <Custom:TabView IsAddTabButtonVisible="False" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True">
                     <!-- Статическая вкладка Заказы -->
                     <Custom:TabViewItem Header="Заказы" IsClosable="False">
                         <controls:DataGrid x:Name="DataGridOrd" x:Uid="DataTable" AutoGenerateColumns="False" GridLinesVisibility="Horizontal">
@@ -123,7 +123,7 @@
                     </Custom:TabViewItem>
                 </Custom:TabView>
                 <!-- Кнопка "+" -->
-                <Button Width="40" Height="40" VerticalAlignment="Bottom" Margin="10,10,0,10" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True" ToolTipService.ToolTip="Управление">
+                <Button Width="40" Height="40" VerticalAlignment="Bottom" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True" ToolTipService.ToolTip="Управление">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <SymbolIcon Symbol="AllApps" Margin="0,0,5,0"/>
                     </StackPanel>

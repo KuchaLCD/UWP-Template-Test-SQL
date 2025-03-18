@@ -28,6 +28,7 @@ using Windows.UI.Xaml.Navigation;
 using static System.Net.Mime.MediaTypeNames;
 using static UWP_Template_Test_SQL.Core.Models.UWPTClassLibrary;
 using static UWP_Template_Test_SQL.Views.MainPage;
+using ClosedXML.Excel;
 
 // Документацию по шаблону элемента "Пустая страница" см. по адресу https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -410,6 +411,7 @@ namespace UWP_Template_Test_SQL.Views
             //}
         }
         #endregion
+
         #region Добавление элементов из меню Менеджера ресурсов
         private void AddOrderButton_Click(object sender, RoutedEventArgs e)
         {
@@ -422,58 +424,76 @@ namespace UWP_Template_Test_SQL.Views
             //Frame.Navigate(typeof(OrderPageReview));
         }
         #endregion
+
+        #region Кнопки вывода инфы по всем ключевым объектам
         private async void OutputDocButton_Click(object sender, RoutedEventArgs e)
         {
             // Путь к файлу
             //string filePath = @"C:\Users\CATAT\OneDrive\Documents\Приказ_о_введении_автобуса_в_эксплуатацию_8228.doc";
 
-            // Создаем FilePicker
-            FileOpenPicker filePicker = new FileOpenPicker();
-            filePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            filePicker.FileTypeFilter.Add(".docx");
+            // Открываем диалог выбора файла (рабочий метод. Можно редачить вообще ЛЮБУЮ ячейку в .xlsx)
+            FileOpenPicker openPicker = new FileOpenPicker();
+            openPicker.ViewMode = PickerViewMode.List;
+            openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            openPicker.FileTypeFilter.Add(".xlsx");
 
-            // Пользователь выбирает файл
-            StorageFile file = await filePicker.PickSingleFileAsync();
-            // Открываем документ
-            using (WordprocessingDocument doc = WordprocessingDocument.Open(file.Path, true)) //Решить проблему с доступом к файлам для чтения
+            StorageFile file = await openPicker.PickSingleFileAsync();
+
+            if (file != null)
             {
-                // Получаем основную часть документа
-                MainDocumentPart mainPart = doc.MainDocumentPart;
-
-                // Находим таблицу в документе
-                Table table = mainPart.Document.Body.Elements<Table>().FirstOrDefault();
-
-                if (table != null)
+                try
                 {
-                    // Находим первую строку в таблице
-                    TableRow row = table.Elements<TableRow>().FirstOrDefault();
-
-                    if (row != null)
+                    // Создаем временный поток для сохранения данных
+                    using (var memoryStream = new MemoryStream())
                     {
-                        // Находим первую ячейку в строке
-                        TableCell cell = row.Elements<TableCell>().FirstOrDefault();
-
-                        if (cell != null)
+                        // Загружаем файл Excel в память
+                        using (var fileStream = await file.OpenStreamForReadAsync())
                         {
-                            // Создаем параграф и текст для вставки
-                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = cell.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().FirstOrDefault();
-                            if (paragraph == null)
+                            fileStream.CopyTo(memoryStream);
+                        }
+
+                        // Работаем с файлом в памяти
+                        using (var workbook = new XLWorkbook(memoryStream))
+                        {
+                            var worksheet = workbook.Worksheet(1); // Получаем первый лист
+
+                            // Вставляем данные в ячейку
+                            if (DataGridTransp.SelectedIndex >= 0 && DataGridTransp.SelectedIndex < ListsDB.transports.Count)
                             {
-                                paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                                cell.Append(paragraph);
+                                worksheet.Cell(14, 1).Value = $"1. Автобус {ListsDB.transports[DataGridTransp.SelectedIndex].Naming}";
+                                worksheet.Cell(14, 4).Value = $" с {ListsDB.transports[DataGridTransp.SelectedIndex].TimeOfRegistrForPark}";
+                            }
+                            else
+                            {
+                                worksheet.Cell(14, 1).Value = "1. Автобус (не выбран)";
                             }
 
-                            DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run();
-                            DocumentFormat.OpenXml.Wordprocessing.Text text = new DocumentFormat.OpenXml.Wordprocessing.Text("автобус");
-                            run.Append(text);
-                            paragraph.Append(run);
+                            // Сохраняем изменения в поток памяти
+                            workbook.Save();
+                        }
+
+                        // Перезаписываем файл из памяти
+                        using (var fileStream = await file.OpenStreamForWriteAsync())
+                        {
+                            memoryStream.Seek(0, SeekOrigin.Begin); // Сбрасываем позицию потока
+                            await memoryStream.CopyToAsync(fileStream);
                         }
                     }
-                }
 
-                // Сохраняем изменения
-                mainPart.Document.Save();
+                    // Показываем сообщение об успешном сохранении
+                    var dialog = new MessageDialog("Файл успешно сохранён.", "Успех");
+                    await dialog.ShowAsync();
+
+                    // Открываем сохранённый файл
+                    await Windows.System.Launcher.LaunchFileAsync(file);
+                }
+                catch (Exception ex)
+                {
+                    var dialog = new MessageDialog($"Ошибка при сохранении файла: {ex.Message}", "Ошибка");
+                    await dialog.ShowAsync();
+                }
             }
         }
+        #endregion
     }
 }
